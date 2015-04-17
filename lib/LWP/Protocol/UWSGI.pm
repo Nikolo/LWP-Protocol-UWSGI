@@ -15,6 +15,36 @@ LWP::Protocol::implementor($_, __PACKAGE__) for qw( uwsgi );
 
 our $CRLF = $LWP::Protocol::http::CRLF;
 
+=head1 NAME
+
+LWP::Protocol::UWSGI - uwsgi support for LWP
+
+=head1 SYNOPSIS
+
+  use LWP::Protocol::UWSGI;
+  use LWP::UserAgent;
+  $res = $ua->get("uwsgi://www.example.com");
+
+=head1 DESCRIPTION
+
+The LWP::Protocol::UWSGI module provide support for using uwsgi
+protocol with LWP. 
+
+This module unbundled with the libwww-perl.
+
+=head1 SEE ALSO
+
+L<LWP::UserAgent>, L<LWP::Protocol>
+
+=head1 COPYRIGHT
+
+Copyright 2015 Nikolas Shulyakovskiy.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+
 sub request {
 	my($self, $request, $proxy, $arg, $size, $timeout) = @_;
 
