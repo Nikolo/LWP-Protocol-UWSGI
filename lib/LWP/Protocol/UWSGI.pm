@@ -3,7 +3,7 @@ package LWP::Protocol::UWSGI;
 use strict;
 use utf8;
 
-use version; our $VERSION = qv('v1.0.2');
+use version; our $VERSION = qv('v1.1.0');
 
 use HTTP::Response	qw( );
 use LWP::Protocol::http qw( );
@@ -150,7 +150,7 @@ sub request {
 	my $env = {};
 	$env->{QUERY_STRING}   = $1 if $fullpath =~ m,^[^?]+(?:\?(.*))?$,;
 	$env->{REQUEST_METHOD} = $method;
-	$env->{CONTENT_LENGTH} = $request_headers->header('Content-Length') //'';
+	$env->{CONTENT_LENGTH} = defined $request_headers->header('Content-Length') ? $request_headers->header('Content-Length') : '';
 	$env->{CONTENT_TYPE}   = '';
 	$env->{REQUEST_URI}    = $fullpath;
 	$env->{PATH_INFO}      = $url->path;
@@ -162,19 +162,19 @@ sub request {
 	
 	foreach my $k (keys %h) {
 		(my $env_k = uc $k) =~ tr/-/_/;
-		$env->{"HTTP_$env_k"} = $h{$k} // '';
+		$env->{"HTTP_$env_k"} = defined $h{$k} ? $h{$k} : '';
 	}
 
 	my $data = '';
-	foreach my $k (sort keys $env) {
+	foreach my $k (sort keys %$env) {
 		die "Undef value found for $k" unless defined $env->{$k};
-		$data .= pack 'v1/av1/a', map { Encode::encode('utf8', $_) } $k, $env->{$k};
+		$data .= pack 'v/a*v/a*', map { Encode::encode('utf8', $_) } $k, $env->{$k};
 	}
 
 	my $req_buf = pack('C1v1C1',
-		5 // PSGI_MODIFIER1,
+		5, # PSGI_MODIFIER1,
 		length($data),
-		0 // PSGI_MODIFIER2,
+		0, # PSGI_MODIFIER2,
 	) . $data;
 
 	if (!$has_content || $has_content > 8*1024) {
