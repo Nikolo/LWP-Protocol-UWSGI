@@ -3,7 +3,7 @@ package LWP::Protocol::UWSGI;
 use strict;
 use utf8;
 
-use version; our $VERSION = qv('v1.1.0');
+use version; our $VERSION = qv('v1.1.3');
 
 use HTTP::Response	qw( );
 use LWP::Protocol::http qw( );
@@ -64,11 +64,9 @@ sub request {
 		                            'Library does not allow this host ' .
 					    "$$url for 'uwsgi:' URLs");
 	}
-	my($host, $port) = ($1, $2);
-
 	my ($host,$port) = $proxy
 		? ($proxy->host,$proxy->port)
-		: ($host,$port);
+		: ($1,$2);
 	my $fullpath =
 		$method eq 'CONNECT' 
 			? $url->host . ":" . $url->port 
@@ -148,7 +146,7 @@ sub request {
 	}
 
 	my $env = {};
-	$env->{QUERY_STRING}   = $1 if $fullpath =~ m,^[^?]+(?:\?(.*))?$,;
+	$env->{QUERY_STRING}   = $fullpath =~ m,^[^?]+(?:\?(.*))?$, ? $1 : '';
 	$env->{REQUEST_METHOD} = $method;
 	$env->{CONTENT_LENGTH} = defined $request_headers->header('Content-Length') ? $request_headers->header('Content-Length') : '';
 	$env->{CONTENT_TYPE}   = '';
