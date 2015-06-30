@@ -3,7 +3,7 @@ package LWP::Protocol::UWSGI;
 use strict;
 use utf8;
 
-use version; our $VERSION = qv('v1.1.3');
+use version; our $VERSION = qv('v1.1.4');
 
 use HTTP::Response	qw( );
 use LWP::Protocol::http qw( );
@@ -146,10 +146,10 @@ sub request {
 	}
 
 	my $env = {};
-	$env->{QUERY_STRING}   = $fullpath =~ m,^[^?]+(?:\?(.*))?$, ? $1 : '';
+	$env->{QUERY_STRING}   = $fullpath =~ m,^[^?]+\?(.+)$, ? $1 : '';
 	$env->{REQUEST_METHOD} = $method;
 	$env->{CONTENT_LENGTH} = defined $request_headers->header('Content-Length') ? $request_headers->header('Content-Length') : '';
-	$env->{CONTENT_TYPE}   = '';
+	$env->{CONTENT_TYPE}   = $method =~ /post/i ? 'application/x-www-form-urlencoded' : '';
 	$env->{REQUEST_URI}    = $fullpath;
 	$env->{PATH_INFO}      = $url->path;
 	$env->{SERVER_PROTOCOL}= 'HTTP/1.1';
