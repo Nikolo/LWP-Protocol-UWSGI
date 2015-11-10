@@ -8,6 +8,7 @@ use version; our $VERSION = qv('v1.1.4');
 use HTTP::Response	qw( );
 use LWP::Protocol::http qw( );
 use Encode;
+use URI::Escape::XS	qw();
 
 use base qw/LWP::Protocol::http/;
 
@@ -157,6 +158,12 @@ sub request {
 	$env->{REMOTE_PORT}    = $socket->sockport;
 	$env->{SERVER_PORT}    = $port;
 	$env->{SERVER_NAME}    = $host;
+
+	if ($request->header('X-UWSGI-Nginx-Compatible-Mode')) {
+		$env->{PATH_INFO} = URI::Escape::XS::uri_unescape(
+			$env->{PATH_INFO}
+		);
+	}
 	
 	foreach my $k (keys %h) {
 		(my $env_k = uc $k) =~ tr/-/_/;

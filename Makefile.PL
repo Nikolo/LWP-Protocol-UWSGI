@@ -13,6 +13,7 @@ WriteMakefile(
 		LWP::Protocol::http => 0,
 		Net::HTTP           => 0,
 		URI                 => 0,
+		URI::Escape::XS	    => 0,
 	},
 	($] >= 5.005 ?	 ## Add these new keywords supported since 5.005
 	  (ABSTRACT_FROM => 'lib/LWP/Protocol/UWSGI.pm', # retrieve abstract from module
