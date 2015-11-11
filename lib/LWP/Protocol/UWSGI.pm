@@ -3,7 +3,7 @@ package LWP::Protocol::UWSGI;
 use strict;
 use utf8;
 
-use version; our $VERSION = qv('v1.1.4');
+use version; our $VERSION = qv('v1.1.8');
 
 use HTTP::Response	qw( );
 use LWP::Protocol::http qw( );
@@ -160,9 +160,9 @@ sub request {
 	$env->{SERVER_NAME}    = $host;
 
 	if ($request->header('X-UWSGI-Nginx-Compatible-Mode')) {
-		$env->{PATH_INFO} = URI::Escape::XS::uri_unescape(
+		$env->{PATH_INFO} = Encode::decode('utf8', URI::Escape::XS::uri_unescape(
 			$env->{PATH_INFO}
-		);
+		));
 	}
 	
 	foreach my $k (keys %h) {
